@@ -43,39 +43,76 @@ def read_input():
     return nodes, node_input, data
 
 def get_entropy(data):
+    total = len(data)
     posible_labels = { l: 0  for l in list(set(data)) }
     for value in data:
         posible_labels[value] += 1
-    total = sum([ posible_labels[l] for l in posible_labels ])
     entropy = sum([ ((posible_labels[l]/total) * math.log2(posible_labels[l]/total)) for l in posible_labels ])
-    return -1 * entropy
+    return abs(entropy)
 
-def get_information_gain(entropy, data):
-    posible_values = { l: 0  for l in list(set(data)) }
-    for value in data:
-        posible_values[value] += 1
-    total = sum([ posible_values[l] for l in posible_values ])
+
+def get_information_gain(entropy, data, labels):
+    total = len(data)
+    posible_values = get_posible_value_dict(data, labels)
+    # for v in posible_values:
+        # print('\t',get_entropy(posible_values[v])* (len(posible_values[v])/total))
+    sub_entropy = sum([ (get_entropy(posible_values[v]) * (len(posible_values[v])/total)) for v in posible_values ])
+    return entropy - sub_entropy
 
 def get_value_list(data, index):
     if index == -1:
         return [ row[len(row) - 1] for row in data ]
     return [ row[index] for row in data ]
 
+def drop_column(data, index):
+    neu_data = []
+    for row in data:
+        if index == -1:
+            neu_data.append(row[:-1])
+        else:
+            neu_data.append(row[:index] + row[index + 1:])
+    return neu_data
+
 def generate_decision_tree(data, feature_names):
     # tree = {order ocurrence}
-    print(feature_names)
+    tree = {}
     label_list = get_value_list(data, -1)
+    label_name, feature_names = feature_names[-1], feature_names[:-1] 
+    data = drop_column(data, -1)
     system_entropy = get_entropy(label_list)
-    print(system_entropy)
-    # for label in labels:
-        # print(l)
-    # for row in data:
-        # print(row[len(row) - 1])
+    # print('Entropy: ', system_entropy)
+
+    order = []
+    current_data = copy.deepcopy(data)
+    current_feature_names = copy.deepcopy(feature_names)
+    for i in range(len(feature_names)):
+        most_ig, most_index = -1.0, -1
+        for j in range(len(current_feature_names)):
+            column = get_value_list(current_data, j)
+            current_ig = get_information_gain(system_entropy, column, label_list)
+            if current_ig > most_ig:
+                most_ig, most_index = current_ig, j
+                best_column = column
+        tree[current_feature_names[most_index]] = { v:False for v in list(set(best_column))}
+        order.append(current_feature_names[most_index])
+
+        #obtener misma lista de correspondencia y ver los unique de cada attributo y si es uno ponerselo al valor en el arbol
+
+        # RECURSIVAMENTE MIENTRAS HAYA INFORMACION DISPONIBLE EN DATA
+        # CONSEGUIR COLUMNA CON MAYOR INFORMATION GAIN
+        # AGREGAR AL ARBOL LA COLUMNA CON LOS VALORES DIRECTOS QUE DE 1
+        # EN EL RESTO GUARDAR LA LISTA QUE CORRESPONDE A LOS LABELS DE ESA SEPARACION
+
+        #tomar otra decicion o declarar respuesta
+        current_data = drop_column(current_data, most_index)
+        current_feature_names = current_feature_names[:most_index] + current_feature_names[most_index + 1:]
+    print(json.dumps(tree, indent=2))
+
+
 
 def main():
 
     nodes, node_to_data, data = read_input()
-
 
     generate_decision_tree(data, node_to_data)
 
@@ -87,5 +124,5 @@ def main():
 
 
 
-if __name__ == '__main__':
+if _name_ == '_main_':
     main()

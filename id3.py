@@ -28,6 +28,9 @@ def read_input():
         if '@attribute' in line:
             count -= 1
             _, label, *rest = line.split(' ')
+            if '\t' in label:
+                label = label.split('\t')
+            print(label)
             rest = [ r for r in rest if r is not '' and r is not ' ' ]
             nodes[label] = {}
             values = [re.sub(r'[ \{\},\t]','',value) for value in rest]

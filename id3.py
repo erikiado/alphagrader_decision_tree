@@ -29,9 +29,9 @@ def read_input():
             count -= 1
             _, label, *rest = line.split(' ')
             rest = [ r for r in rest if r is not '' and r is not ' ' ]
-            print(rest)
             nodes[label] = {}
             values = [re.sub(r'[ \{\},\t]','',value) for value in rest]
+            print(values)
             nodes[label]['values'] = values
             node_input.append(label)
             if not count:

@@ -97,7 +97,7 @@ def split_data(data, labels, feature_names, system_entropy, spaces):
         print((' '*spaces) + 'ANSWER: ' + labels[0] )
         return
     feature, most_index, most_ig = get_most_information_gain(data, labels, feature_names, system_entropy)
-    posibles = list(set(get_value_list(data,most_index)))
+    posibles = nodes[feature]['values'] # list(set(get_value_list(data,most_index)))
     for i, p in enumerate(posibles):
         sub = []
         n_labels = []

@@ -31,7 +31,7 @@ def read_input():
             rest = [ r for r in rest if r is not '' and r is not ' ' ]
             print(rest)
             nodes[label] = {}
-            values = [re.sub(r'[ \{\},]','',value) for value in rest]
+            values = [re.sub(r'[ \{\},\t]','',value) for value in rest]
             nodes[label]['values'] = values
             node_input.append(label)
             if not count:

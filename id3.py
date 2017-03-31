@@ -29,7 +29,8 @@ def read_input():
             count -= 1
             _, label, *rest = line.split(' ')
             if '\t' in label:
-                label = label.split('\t')
+                label, *lrest = label.split('\t')
+                rest = lrest + rest
             print(label)
             rest = [ r for r in rest if r is not '' and r is not ' ' ]
             nodes[label] = {}

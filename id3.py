@@ -31,7 +31,7 @@ def read_input():
             if '\t' in label:
                 label, *lrest = label.split('\t')
                 rest = lrest + rest
-            print(label)
+            print(rest)
             rest = [ r for r in rest if r is not '' and r is not ' ' ]
             nodes[label] = {}
             values = [re.sub(r'[ \{\},\t]','',value) for value in rest]

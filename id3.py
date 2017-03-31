@@ -1,8 +1,7 @@
 import fileinput
-import json
-import copy
 import re
 import math
+
 
 def read_input():
     step = 0
@@ -10,11 +9,9 @@ def read_input():
     node_input = []
     data = []
     lines = []
-
     # Read file input and clean each line
     for line in fileinput.input():
         lines.append(line.strip())
-
     count = 0
     for line in lines:
         if '@attribute' in line and line[0] is not '%':
@@ -39,8 +36,8 @@ def read_input():
                 nodes[label]['output'] = True       
         if on_data:
             data.append(line.split(','))
-
     return nodes, node_input, data
+
 
 def get_entropy(data):
     total = len(data)
@@ -51,18 +48,25 @@ def get_entropy(data):
     return abs(entropy)
 
 
+def get_posible_value_dict(data, labels):
+    posible_values = { v: []  for v in list(set(data)) }
+    for i, l in enumerate(labels):
+        posible_values[data[i]].append(l)
+    return posible_values
+
+
 def get_information_gain(entropy, data, labels):
     total = len(data)
     posible_values = get_posible_value_dict(data, labels)
-    # for v in posible_values:
-        # print('\t',get_entropy(posible_values[v])* (len(posible_values[v])/total))
     sub_entropy = sum([ (get_entropy(posible_values[v]) * (len(posible_values[v])/total)) for v in posible_values ])
     return entropy - sub_entropy
+
 
 def get_value_list(data, index):
     if index == -1:
         return [ row[len(row) - 1] for row in data ]
     return [ row[index] for row in data ]
+
 
 def drop_column(data, index):
     neu_data = []
@@ -73,56 +77,51 @@ def drop_column(data, index):
             neu_data.append(row[:index] + row[index + 1:])
     return neu_data
 
+
+def get_most_information_gain(data, labels, feature_names, system_entropy):
+    most_ig, most_index = -1.0, -1
+    for j in range(len(feature_names)):
+        column = get_value_list(data, j)
+        current_ig = get_information_gain(system_entropy, column, labels)
+        if current_ig > most_ig:
+            most_ig, most_index = current_ig, j
+    if most_index == -1:
+        return None, -1, 0
+    else:
+        return feature_names[most_index], most_index, most_ig
+
+
+def split_data(data, labels, feature_names, system_entropy, spaces):
+    if len(set(labels)) == 1:
+        print((' '*spaces) + 'ANSWER: ' + labels[0] )
+        return
+    feature, most_index, most_ig = get_most_information_gain(data, labels, feature_names, system_entropy)
+    posibles = list(set(get_value_list(data,most_index)))
+    for i, p in enumerate(posibles):
+        sub = []
+        n_labels = []
+        for j, row in enumerate(data):
+            if row[most_index] == p:
+                sub.append(row)
+                n_labels.append(labels[j])
+        if feature:
+            print((' '*spaces) + feature + ': ' +p)
+        neu_names = feature_names[:most_index] + feature_names[most_index + 1:]
+        split_data(sub, n_labels, feature_names, system_entropy, spaces+2)
+
+
 def generate_decision_tree(data, feature_names):
-    # tree = {order ocurrence}
-    tree = {}
     label_list = get_value_list(data, -1)
     label_name, feature_names = feature_names[-1], feature_names[:-1] 
     data = drop_column(data, -1)
     system_entropy = get_entropy(label_list)
-    # print('Entropy: ', system_entropy)
-
-    order = []
-    current_data = copy.deepcopy(data)
-    current_feature_names = copy.deepcopy(feature_names)
-    for i in range(len(feature_names)):
-        most_ig, most_index = -1.0, -1
-        for j in range(len(current_feature_names)):
-            column = get_value_list(current_data, j)
-            current_ig = get_information_gain(system_entropy, column, label_list)
-            if current_ig > most_ig:
-                most_ig, most_index = current_ig, j
-                best_column = column
-        tree[current_feature_names[most_index]] = { v:False for v in list(set(best_column))}
-        order.append(current_feature_names[most_index])
-
-        #obtener misma lista de correspondencia y ver los unique de cada attributo y si es uno ponerselo al valor en el arbol
-
-        # RECURSIVAMENTE MIENTRAS HAYA INFORMACION DISPONIBLE EN DATA
-        # CONSEGUIR COLUMNA CON MAYOR INFORMATION GAIN
-        # AGREGAR AL ARBOL LA COLUMNA CON LOS VALORES DIRECTOS QUE DE 1
-        # EN EL RESTO GUARDAR LA LISTA QUE CORRESPONDE A LOS LABELS DE ESA SEPARACION
-
-        #tomar otra decicion o declarar respuesta
-        current_data = drop_column(current_data, most_index)
-        current_feature_names = current_feature_names[:most_index] + current_feature_names[most_index + 1:]
-    print(json.dumps(tree, indent=2))
-
+    split_data(data, label_list, feature_names, system_entropy, 0)
 
 
 def main():
-
     nodes, node_to_data, data = read_input()
-
     generate_decision_tree(data, node_to_data)
 
-    # print(json.dumps(nodes, indent=2))
-    # print(node_to_data)
-    # for line in data:
-    #     print(line)
 
-
-
-
-if _name_ == '_main_':
+if __name__ == '__main__':
     main()

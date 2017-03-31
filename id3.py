@@ -31,7 +31,6 @@ def read_input():
             if '\t' in label:
                 label, *lrest = label.split('\t')
                 rest = lrest + rest
-            print(rest)
             rest = [ r for r in rest if r is not '' and r is not ' ' ]
             nodes[label] = {}
             values = [re.sub(r'[ \{\},\t]','',value) for value in rest]
@@ -125,8 +124,7 @@ def generate_decision_tree(data, feature_names):
 
 def main():
     nodes, node_to_data, data = read_input()
-    print(node_to_data)
-    # generate_decision_tree(data, node_to_data)
+    generate_decision_tree(data, node_to_data)
 
 
 if __name__ == '__main__':

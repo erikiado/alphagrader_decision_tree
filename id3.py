@@ -2,10 +2,10 @@ import fileinput
 import re
 import math
 
+nodes = {}
 
 def read_input():
     step = 0
-    nodes = {}
     node_input = []
     data = []
     lines = []
@@ -28,7 +28,7 @@ def read_input():
         if '@attribute' in line:
             count -= 1
             _, label, *rest = line.split(' ')
-            rest = [ r for r in rest if r is not '' ]
+            rest = [ r for r in rest if r is not '' or r is not ' ' ]
             nodes[label] = {}
             values = [re.sub(r'[ \{\},]','',value) for value in rest]
             nodes[label]['values'] = values

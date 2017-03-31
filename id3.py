@@ -32,6 +32,7 @@ def read_input():
             nodes[label] = {}
             values = [re.sub(r'[ \{\},\t]','',value) for value in rest]
             nodes[label]['values'] = values
+            print(nodes[label]['values'])
             node_input.append(label)
             if not count:
                 nodes[label]['output'] = True       
@@ -121,7 +122,7 @@ def generate_decision_tree(data, feature_names):
 
 def main():
     nodes, node_to_data, data = read_input()
-    generate_decision_tree(data, node_to_data)
+    # generate_decision_tree(data, node_to_data)
 
 
 if __name__ == '__main__':

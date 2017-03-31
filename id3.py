@@ -32,7 +32,6 @@ def read_input():
             nodes[label] = {}
             values = [re.sub(r'[ \{\},\t]','',value) for value in rest]
             nodes[label]['values'] = values
-            print(nodes[label]['values'])
             node_input.append(label)
             if not count:
                 nodes[label]['output'] = True       
@@ -99,6 +98,8 @@ def split_data(data, labels, feature_names, system_entropy, spaces):
         return
     feature, most_index, most_ig = get_most_information_gain(data, labels, feature_names, system_entropy)
     posibles = nodes[feature]['values'] # list(set(get_value_list(data,most_index)))
+    print(feature_names)
+    print(posibles)
     for i, p in enumerate(posibles):
         sub = []
         n_labels = []
@@ -122,7 +123,7 @@ def generate_decision_tree(data, feature_names):
 
 def main():
     nodes, node_to_data, data = read_input()
-    # generate_decision_tree(data, node_to_data)
+    generate_decision_tree(data, node_to_data)
 
 
 if __name__ == '__main__':
